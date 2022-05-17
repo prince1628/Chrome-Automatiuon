@@ -1,0 +1,114 @@
+import sys
+import webbrowser
+import keyboard
+import pyttsx3
+import speech_recognition as sr
+import datetime
+
+
+
+engine = pyttsx3.init('sapi5')
+voice = engine.getProperty('voices')
+engine.setProperty('voices',voice[1].id)
+engine.setProperty('rate',255)
+
+
+def speak(audio):
+    engine.say(audio)
+    print(audio)
+    engine.runAndWait()
+
+
+# show time
+def time():
+    time = datetime.datetime.now().strftime("%I:%M:%S")
+    speak("the current time is  " + time)
+
+
+# show date
+def date1():
+    a = datetime.date.today()
+    speak(a)
+
+# this function will wish
+def wishme():
+    speak("welcome sir ")
+    time()
+    speak("the current date is")
+    date1()
+    hour = datetime.datetime.now().hour
+    if hour >= 6 and hour < 12:
+        speak("good morning sir")
+    if hour >= 12 and hour < 18:
+        speak("good evening sir")
+    else:
+        speak("good night sir")
+    engine.setProperty('rate',200)
+    speak("this is chrome automation to do somrething on chrome say something to chrome")
+
+def takecommand():
+
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("listening..")
+        r.pause_threshold = 1
+        audio = r.listen(source)
+
+    try:
+        print("recogniting.....")
+        query = r.recognize_google(audio,language='en-in')
+        print(f"user said:{query}")
+
+    except Exception as e:
+
+        speak("say that again plzz")
+        return "none"
+    return  query
+
+
+if __name__=="__main__":
+
+    wishme()
+
+    speak("opening chrome ")
+    speak(" ready to get direction")
+    webbrowser.open("chrome")
+
+    while True:
+
+        query = str(takecommand().lower())
+
+        if "search" in query:
+            speak("what u want 2 search")
+            a = takecommand().lower()
+            speak(f"fetching results for {a} on chrome")
+            webbrowser.open(f"https://www.google.com/search?q={a}&rlz=1C1CHBF_enIN998IN998&oq=hjk&aqs=chrome.0.69i59l2.1114j0j7&sourceid=chrome&ie=UTF-8")
+
+        elif  "open new tab" in query:
+            speak("opening new tab")
+            keyboard.press_and_release("Ctrl+t")
+
+        elif "open menu" in query:
+            speak("opening menu")
+            keyboard.press_and_release("Alt+f")
+
+        elif "open history" in query:
+            speak("opening history")
+            keyboard.press_and_release("Ctrl+h")
+
+        elif "jump to address bar " in query:
+            speak("going to address bar")
+            keyboard.press_and_release("Ctrl+l")
+
+        elif "switch tab" in query:
+            speak("to which tab u want to switch")
+            a = takecommand().lower()
+            keyboard.press_and_release(f"Ctrl+{a}")
+
+
+        elif "no thanks" in query:
+            speak("thanks for using google automation")
+            sys.exit()
+
+
+        speak("what else i can do for u sir")
